@@ -6,9 +6,10 @@ class ChronalCoordinates
 
   def initialize(coordinates)
 
-    @coordinates = coordinates.split("\n").collect do |coordinate|
-      "#{coordinate.split.first.to_i}, #{coordinate.split.last.to_i}"
-    end
+    @coordinates = make_coordinates(coordinates)
+    @max_x = 0
+    @max_y = 0
+    determine_max_dimensions
     @grid = make_initial_grid
     @drawn_coordinates = false
   end
@@ -16,7 +17,9 @@ class ChronalCoordinates
   def draw_coordinates
     abc = ('A'..'Z').to_a
     @coordinates.each.with_index do |coordinate, i|
-      @grid[coordinate] = abc[i]
+      coordinate.id = abc[i]
+      key = "#{coordinate.x}, #{coordinate.y}"
+      @grid[key] = coordinate
     end
 
     @drawn_coordinates = true
@@ -27,7 +30,7 @@ class ChronalCoordinates
   def fill_in_grid
     draw_coordinates if @drawn_coordinates == false
 
-    
+
 
 
   end
@@ -35,12 +38,13 @@ class ChronalCoordinates
   private
 
   def render
-    max_x = max_dimension.first
-    max_y = max_dimension.last
     rows = []
 
-    (max_y + 1).times do |y|
-      rows << (max_x + 2).times.collect{ |x| @grid["#{x}, #{y}"] }.join('')
+    (@max_y + 1).times do |y|
+      rows << (@max_x + 2).times.collect{ |x|
+        str_or_coord = @grid["#{x}, #{y}"]
+        str_or_coord.class == String ? str_or_coord : str_or_coord.id
+      }.join('')
     end
 
     image = rows.collect { |row| row + "\n" }.join
@@ -48,35 +52,44 @@ class ChronalCoordinates
     return image
   end
 
-  def max_dimension
-    across = 0
-    down = 0
-
+  def determine_max_dimensions
     @coordinates.each do |coordinate|
-      xy = coordinate.split(',')
-      x = xy.first.to_i
-      y = xy.last.to_i
-
-      across = x if across < x
-      down = y if down < y
+      @max_x = coordinate.x if @max_x < coordinate.x
+      @max_y = coordinate.y if @max_y < coordinate.y
     end
-    return [across, down]
   end
 
   def make_initial_grid
-    max_x = max_dimension.first
-    max_y = max_dimension.last
-
     grid = {}
 
-    (max_y + 1).times do |y|
-      (max_x + 2).times do |x|
+    (@max_y + 1).times do |y|
+      (@max_x + 2).times do |x|
         grid["#{x}, #{y}"] = '.'
       end
     end
     grid
   end
 
+  def make_coordinates(coordinates)
+    individual_coordinates = coordinates.split("\n")
 
+    collection_of_coordinates = individual_coordinates.collect do |coordinate|
+      x = coordinate.split.first.to_i
+      y = coordinate.split.last.to_i
+      Coordinate.new(x, y)
+    end
+  end
+
+end
+
+class Coordinate
+
+  attr_accessor :x, :y, :id
+
+  def initialize(x, y, id = nil)
+    @id = id
+    @x = x
+    @y = y
+  end
 
 end
