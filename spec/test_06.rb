@@ -3,7 +3,12 @@ require 'rspec'
 
 describe ChronalCoordinates do
 
-  let(:sample_coordinates) {ChronalCoordinates.new([1,1], [1,6], [8,3], [3,4], [5,5], [8,9])}
+  let(:sample_coordinates) {ChronalCoordinates.new('1, 1
+    1, 6
+    8, 3
+    3, 4
+    5, 5
+    8, 9')}
 
   # it 'stores the coordinates as hash keys in x-y- format' do
   #   expect(thing).to eq(other_thing)
@@ -56,12 +61,10 @@ describe ChronalCoordinates do
   end
 
   it 'understands that A, B, C and F have "infinite" area' do
-    expect(sample_coordinates.coordinates_with_infinite.to eq(['A', 'B', 'C', 'F'])
+    expect(sample_coordinates.coordinates_with_infinite).to eq(['A', 'B', 'C', 'F'])
   end
 
   it 'determines the largest finite area is 17' do
-    expect(sample_coordinates.largest_area).to eq(17)
+    expect(sample_coordinates.largest_finite_area).to eq(17)
   end
-
-
 end
