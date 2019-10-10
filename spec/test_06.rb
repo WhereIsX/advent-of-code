@@ -26,7 +26,7 @@ describe ChronalCoordinates do
       ..........
       ..........
       ........F.
-    GRID
+      GRID
 
     expect(sample_coordinates.draw_coordinates).to eq(drawn_coordinates)
   end

@@ -5,9 +5,12 @@ class ChronalCoordinates
   attr_reader :coordinates
 
   def initialize(coordinates)
-    @coordinates = coordinates.split("\n")
-    @grid = self.make_initial_grid
-    binding.pry
+
+    @coordinates = coordinates.split("\n").collect do |coordinate|
+      "#{coordinate.split.first.to_i}, #{coordinate.split.last.to_i}"
+    end
+    @grid = make_initial_grid
+    @drawn_coordinates = false
   end
 
   def draw_coordinates
@@ -16,21 +19,33 @@ class ChronalCoordinates
       @grid[coordinate] = abc[i]
     end
 
-    @grid.collect {|k,v| v} 
+    @drawn_coordinates = true
 
-    # self.render
+    render
   end
 
+  def fill_in_grid
+    draw_coordinates if @drawn_coordinates == false
+
+    
+
+
+  end
+
+  private
+
   def render
-    max_x = self.max_dimension.first
-    max_y = self.max_dimension.last
+    max_x = max_dimension.first
+    max_y = max_dimension.last
     rows = []
 
     (max_y + 1).times do |y|
-      rows << (max_x + 1).times.collect{ |x| @grid["#{x-1}, #{y-1}"] }.join('')
+      rows << (max_x + 2).times.collect{ |x| @grid["#{x}, #{y}"] }.join('')
     end
 
-    rows.join("\n")
+    image = rows.collect { |row| row + "\n" }.join
+    puts image
+    return image
   end
 
   def max_dimension
@@ -49,17 +64,19 @@ class ChronalCoordinates
   end
 
   def make_initial_grid
-    max_x = self.max_dimension.first
-    max_y = self.max_dimension.last
+    max_x = max_dimension.first
+    max_y = max_dimension.last
 
     grid = {}
 
     (max_y + 1).times do |y|
-      (max_x + 1).times do |x|
-        grid["x#{x - 1}, y#{y - 1}"] = '.'
+      (max_x + 2).times do |x|
+        grid["#{x}, #{y}"] = '.'
       end
     end
     grid
   end
+
+
 
 end
