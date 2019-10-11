@@ -14,8 +14,8 @@ describe ChronalCoordinates do
   #   expect(thing).to eq(other_thing)
   # end
 
-  it 'draws the coordinates on the grid' do
-    drawn_coordinates = <<~GRID
+  it 'draws the origins on the grid' do
+    drawn_origins = <<~GRID
       ..........
       .A........
       ..........
@@ -28,7 +28,7 @@ describe ChronalCoordinates do
       ........F.
       GRID
 
-    expect(sample_coordinates.draw_coordinates).to eq(drawn_coordinates)
+    expect(sample_coordinates.draw_origins).to eq(drawn_origins)
   end
 
   it 'fills in the grid' do

@@ -11,10 +11,10 @@ class ChronalCoordinates
     @max_y = 0
     determine_max_dimensions
     @grid = make_initial_grid
-    @drawn_coordinates = false
+    @drawn_origins = false
   end
 
-  def draw_coordinates
+  def draw_origins
     abc = ('A'..'Z').to_a
     @coordinates.each.with_index do |coordinate, i|
       coordinate.id = abc[i]
@@ -22,13 +22,13 @@ class ChronalCoordinates
       @grid[key] = coordinate
     end
 
-    @drawn_coordinates = true
+    @drawn_origins = true
 
     render
   end
 
   def fill_in_grid
-    draw_coordinates if @drawn_coordinates == false
+    draw_origins if @drawn_origins == false
 
 
 
@@ -39,6 +39,7 @@ class ChronalCoordinates
 
   def render
     rows = []
+
 
     (@max_y + 1).times do |y|
       rows << (@max_x + 2).times.collect{ |x|
@@ -51,7 +52,6 @@ class ChronalCoordinates
     puts image
     return image
   end
-
   def determine_max_dimensions
     @coordinates.each do |coordinate|
       @max_x = coordinate.x if @max_x < coordinate.x
@@ -76,20 +76,20 @@ class ChronalCoordinates
     collection_of_coordinates = individual_coordinates.collect do |coordinate|
       x = coordinate.split.first.to_i
       y = coordinate.split.last.to_i
-      Coordinate.new(x, y)
+      Coordinate.new(x: x, y: y, origin: true)
     end
   end
 
 end
 
 class Coordinate
+  attr_accessor :id
+  attr_reader :x, :y, :origin
 
-  attr_accessor :x, :y, :id
-
-  def initialize(x, y, id = nil)
-    @id = id
+  def initialize(x:, y:, origin:, id: nil)
     @x = x
     @y = y
+    @id = id
+    @origin = origin
   end
-
 end
