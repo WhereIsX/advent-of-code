@@ -16,16 +16,16 @@ describe ChronalCoordinates do
 
   it 'draws the origins on the grid' do
     drawn_origins = <<~GRID
-      ..........
-      .A........
-      ..........
-      ........C.
-      ...D......
-      .....E....
-      .B........
-      ..........
-      ..........
-      ........F.
+      .........
+      .A.......
+      .........
+      ........C
+      ...D.....
+      .....E...
+      .B.......
+      .........
+      .........
+      ........F
       GRID
 
     expect(sample_coordinates.draw_origins).to eq(drawn_origins)
@@ -33,16 +33,16 @@ describe ChronalCoordinates do
 
   it 'fills in the grid' do
     filled_in_grid = <<~GRID
-      aaaaa.cccc
-      aAaaa.cccc
-      aaaddecccc
-      aadddeccCc
-      ..dDdeeccc
-      bb.deEeecc
-      bBb.eeee..
-      bbb.eeefff
-      bbb.eeffff
-      bbb.ffffFf
+      aaaaa.ccc
+      aAaaa.ccc
+      aaaddeccc
+      aadddeccC
+      ..dDdeecc
+      bb.deEeec
+      bBb.eeee.
+      bbb.eeeff
+      bbb.eefff
+      bbb.ffffF
     GRID
 
     expect(sample_coordinates.fill_in_grid).to eq(filled_in_grid)
