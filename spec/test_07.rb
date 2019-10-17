@@ -1,50 +1,46 @@
-require_relative '../solution_07.rb'
 require 'rspec'
+require_relative '../solution_07.rb'
 
-describe Forest do
+describe SumOfItsParts do
 
-  let(:example_input) {
-    Forest.new.parse(<<~INPUT
-      Step C must be finished before step A can begin.
-      Step C must be finished before step F can begin.
-      Step A must be finished before step B can begin.
-      Step A must be finished before step D can begin.
-      Step B must be finished before step E can begin.
-      Step D must be finished before step E can begin.
-      Step F must be finished before step E can begin.
-    INPUT
-   )
-  }
+  nodes = <<~NODES
+    Step C must be finished before step A can begin.
+    Step C must be finished before step F can begin.
+    Step A must be finished before step B can begin.
+    Step A must be finished before step D can begin.
+    Step B must be finished before step E can begin.
+    Step D must be finished before step E can begin.
+    Step F must be finished before step E can begin.")
+  NODES
 
-  it "expects C must be finished before step A" do
-    expect(example_input.has_directed_edge?("C", "A")).to eq(true)
-  end
-  it "expects C must be finished before step F" do
-    expect(example_input.has_directed_edge?("C", "F")).to eq(true)
+  let(:example_tree) { SumOfItsParts.new(nodes)}
+
+  it 'has a node C' do
+    expect(example_tree.has_node?(id = 'C')).to eq(true)
   end
 
-  it "expects A must be finished before step B" do
-    expect(example_input.has_directed_edge?("A", "B")).to eq(true)
+  it 'has a node B' do
+    expect(example_tree.has_node?(id = 'B')).to eq(true)
   end
 
-  it "expects A must be finished before step D" do
-    expect(example_input.has_directed_edge?("A", "D")).to eq(true)
+  it 'has a node A which has B and D as its children' do
+    expect(example_tree.children_node_ids('A')).to eq(['B', 'D'])
   end
 
-  it "expects B must be finished before step E" do
-    expect(example_input.has_directed_edge?("B", "E")).to eq(true)
+  # it 'knows root node includes C' do
+  #   expect(example_tree.roots.id).to eq('C')
+  # end
+
+  # it 'finds that both A and F are available after C' do
+  #   expect(example_tree.root.children_node_ids(C)).to eq(['A', 'F'])
+  # end
+
+  # it 'chooses A over F' do
+  #   expect(example_tree.)
+  # end
+
+  it 'determines the order: CABDEF' do
+    expect(example_tree.order).to eq('CABDEF')
   end
-
-  it "expects D must be finished before step E" do
-    expect(example_input.has_directed_edge?("D", "E")).to eq(true)
-  end
-
-  it "expects F must be finished before step E" do
-    expect(example_input.has_directed_edge?("F", "E")).to eq(true)
-  end
-
-  # it "expects "
-
-
 
 end
