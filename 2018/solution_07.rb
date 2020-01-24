@@ -22,16 +22,12 @@ Worker = Struct.new(:current_job, :idle, :time_left, keyword_init: true) {
 }
 
 class SumOfItsParts
-  @@time = {}
-  ('A'..'Z').each.with_index do |letter, seconds|
-    @@time[letter] = seconds + 61
-  end
 
   attr_reader :roots
 
-  def initialize(string)
+  def initialize(string, base_time)
     directions =  parse(string)
-    @nodes = make_nodes(directions)
+    @nodes = make_nodes(directions, base_time)
     @roots = connect(directions)
   end
 
@@ -104,11 +100,12 @@ class SumOfItsParts
     end
   end
 
-  def make_nodes(directions)
+  def make_nodes(directions, base_time)
     unique_nodes = directions.flatten.uniq
 
+
     unique_nodes.collect do |id|
-      Node.new(id: id, time: @@time[id], children: [], parents: [])
+      Node.new(id: id, time: id.ord - 'A'.ord + base_time + 1, children: [], parents: [])
     end
   end
 
@@ -140,7 +137,7 @@ class SumOfItsParts
 
 end
 
-aoc = SumOfItsParts.new($aoc_input)
+aoc = SumOfItsParts.new($aoc_input, 60)
 
 puts "order:  " + aoc.order.to_s
 puts "time:  " + aoc.time_required(5).to_s

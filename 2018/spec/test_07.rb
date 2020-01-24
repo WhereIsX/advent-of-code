@@ -13,7 +13,9 @@ describe SumOfItsParts do
     Step F must be finished before step E can begin.")
   NODES
 
-  let(:example_tree) { SumOfItsParts.new(nodes)}
+  base_time = 0
+
+  let(:example_tree) { SumOfItsParts.new(nodes, base_time)}
 
   it 'has a node C' do
     expect(example_tree.has_node?(id = 'C')).to eq(true)
@@ -43,7 +45,7 @@ describe SumOfItsParts do
     expect(example_tree.order).to eq('CABDFE')
   end
 
-  it 'takes 15 seconds to complete the example given 2 hands' do
+  it 'takes 15 seconds to complete the example given 2 elves' do
     expect(example_tree.time_required(2)).to eq(15)
   end
 
