@@ -32,7 +32,7 @@ describe 'it parses the input into an array' do
   end
 
   it 'correctly executes a multi-sectioned intcode' do
-    expect(solve_part_1(example4)).to eq answer4.first
+    expect(solve_part_1(example4, 1, 1)).to eq answer4.first
   end
 
 end
