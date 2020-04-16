@@ -32,14 +32,13 @@ module AOC2019D04
 
     # IMPLEMENTATION: LOOK FORWARD
     # what is the concept of matching?
-    # we seem to go from "nothing matchines" to
+    # we seem to go from "nothing matches" to
     # these two match.  but we wouldn't say 1 match.
     # it seems like matching is either 0 or 2 and above
     # skipping over the number 1.
 
     adjacent_matching = 0
     locations = []
-    [111000]
     digits.each.with_index do |digit, i|
       next_digit = digits[i+1]
       if digit == next_digit
@@ -62,7 +61,6 @@ module AOC2019D04
     #                       # 3 => four matching;   count is off by 1
     # location = []
     #
-    # [000111]
     # digits.each.with_index do |digit, i|
     #
     #   if last_digit.nil?
