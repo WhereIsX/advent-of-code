@@ -1,5 +1,5 @@
 require 'rspec'
-require_relative 'solution_03.rb'
+require_relative '../solutions/solution_03.rb'
 
 include AOC2019D03
 
@@ -56,4 +56,44 @@ describe AOC2019D03::Segment do
 		it { expect(horiz.y_pos).to eq 0 }
 		it { expect { vert.y_pos }.to raise_error StandardError }
 	end
+
+
+
+end
+
+describe '#make_segments' do
+  let(:wire1) {"R8,U5,L5,D3"}
+
+  it {
+    wire1_seg1 = Segment.new(Point.new(1,0), Point.new(8, 0))
+    wire1_seg4 = Segment.new(Point.new(3, 4), Point.new(3,2))
+    expect(make_segments(wire1).first).to eq wire1_seg1
+    expect(make_segments(wire1).last).to eq wire1_seg4
+  }
+end
+
+
+describe '#solve' do
+  let(:example1) { <<~EX
+    R75,D30,R83,U83,L12,D49,R71,U7,L72
+    U62,R66,U55,R34,D71,R55,D58,R83
+    EX
+  }
+  let(:example1_solution) { 159 }
+
+  it {
+    expect(solve(example1)).to eq example1_solution
+  }
+
+
+  let(:example2) { <<~EX
+    R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51
+    U98,R91,D20,R16,D67,R40,U7,R15,U6,R7
+    EX
+  }
+  let(:example2_solution) { 135 }
+
+  it {
+    expect(solve(example2)).to eq example2_solution
+  }
 end

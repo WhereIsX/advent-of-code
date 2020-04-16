@@ -1,0 +1,30 @@
+
+[1mFrom:[0m /home/yana/Projects/AOConGithub/2019/solutions/solution_03.rb @ line 146 AOC2019D03#solve:
+
+    [1;34m123[0m: [32mdef[0m [1;34msolve[0m(input_as_string)
+    [1;34m124[0m: 
+    [1;34m125[0m: 	[1;34m# process input into segments[0m
+    [1;34m126[0m: 	wires = input_as_string.split([31m[1;31m"[0m[31m[1;35m\n[0m[31m[1;31m"[0m[31m[0m)
+    [1;34m127[0m: 	wire1_segments = make_segments(wires[[1;34m0[0m])
+    [1;34m128[0m: 	wire2_segments = make_segments(wires[[1;34m1[0m])
+    [1;34m129[0m: 
+    [1;34m130[0m: 	all_intersections = []
+    [1;34m131[0m: 	wire1_segments.each [32mdo[0m |seg1|
+    [1;34m132[0m: 		wire2_segments.each [32mdo[0m |seg2|
+    [1;34m133[0m: 			intersections = seg1.intersections_with(seg2)
+    [1;34m134[0m: 			all_intersections.push *intersections [32mif[0m !intersections.empty?
+    [1;34m135[0m: 		[32mend[0m
+    [1;34m136[0m: 	[32mend[0m
+    [1;34m137[0m: 
+    [1;34m138[0m: 
+    [1;34m139[0m: 	lowest_manhattan_distance = [1;36mnil[0m
+    [1;34m140[0m: 	all_intersections.each [32mdo[0m |intersection|
+    [1;34m141[0m: 		manhattan_distance = intersection.x + intersection.y
+    [1;34m142[0m: 		[32mif[0m lowest_manhattan_distance.nil? || manhattan_distance < lowest_manhattan_distance
+    [1;34m143[0m: 			lowest_manhattan_distance = manhattan_distance
+    [1;34m144[0m: 		[32mend[0m
+    [1;34m145[0m: 	[32mend[0m
+ => [1;34m146[0m: 	binding.pry
+    [1;34m147[0m: 	[32mreturn[0m lowest_manhattan_distance
+    [1;34m148[0m: [32mend[0m
+
