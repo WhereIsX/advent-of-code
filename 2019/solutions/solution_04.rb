@@ -12,7 +12,7 @@ module AOC2019D04
   end
 
   def two_adjacent?(number)
-    digits = number.to_s.split("")
+    digits = number.digits
     last_digit = nil
 
     digits.each do |digit|
@@ -25,14 +25,14 @@ module AOC2019D04
     return false
   end
 
-  def large_matching_group_location(number)
+  def all_matching_locations(number)
     # return a range for the beginning and end of the matching group
 
-    digits = number.to_s.split("")
+    digits = number.digits
 
     # IMPLEMENTATION: LOOK FORWARD
     # what is the concept of matching?
-    # we seem to go from "nothing matches" to
+    # we seem to go from "nothing matchnes" to
     # these two match.  but we wouldn't say 1 match.
     # it seems like matching is either 0 or 2 and above
     # skipping over the number 1.
@@ -44,9 +44,7 @@ module AOC2019D04
       if digit == next_digit
         adjacent_matching += 1
       elsif digit != next_digit
-        if adjacent_matching >= 2
-          locations << (i - adjacent_matching ..i)
-        end
+        locations << (i - adjacent_matching ..i)
         adjacent_matching = 0
       end
     end
@@ -86,15 +84,22 @@ module AOC2019D04
     # return location
   end
 
+  def two_adjacent_not_part_of_larger_group?(num)
+    matching_sizes = all_matching_locations(num).collect do |matching_group|
+      matching_group.size
+    end
+    matching_sizes.include?(2)
+  end
+
   def digits_only_increase?(number)
-    digits = number.to_s.split('')
+    digits = number.digits
     last_digit = nil
     digits.each do |digit|
       if last_digit.nil?
         last_digit = digit
-      elsif digit.to_i >= last_digit.to_i
+      elsif digit <= last_digit
         last_digit = digit
-      elsif digit.to_i < last_digit.to_i
+      elsif digit > last_digit
         return false
       end
     end
@@ -114,6 +119,17 @@ module AOC2019D04
     return nums_that_satisfy
   end
 
+
+  def solve_part_2(range)
+    nums_that_satisfy = 0
+    range.each do |num|
+      if satisfactory_number?(num) && two_adjacent_not_part_of_larger_group?(num)
+        nums_that_satisfy +=1
+      end
+    end
+    nums_that_satisfy
+  end
+
 end
 
 include AOC2019D04
@@ -123,7 +139,7 @@ range = (171309..643603)
 # we are lucky that our particular range begins with a 1
 # if it began with a 0, and is a 6-digit number, ruby interprets that as a hexadecimal?
 
-# p solve_part_1(range)
+p solve_part_2(range)
 
 
 # TESTS
@@ -138,7 +154,8 @@ range = (171309..643603)
   p satisfactory_number?(num) == ans
 end
 
-tests = [ 111000, 110011, 111111, 112333 ]
-tests.each do |num|
-  p large_matching_group_location(num)
+{ 112233 => true ,
+  111122 => true ,
+  123444 => false }.each_pair do |num, ans|
+  p satisfactory_number?(num) && two_adjacent_not_part_of_larger_group?(num) == ans
 end
