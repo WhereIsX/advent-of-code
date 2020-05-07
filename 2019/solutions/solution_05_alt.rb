@@ -8,8 +8,8 @@ module AOC2019D05
   end
 
   # @return [Array] opcode, and param mode
-  def get_instructions(intcode, instruction_pointer)
-    instructions = intcode[instruction_pointer]
+  def get_instructions(intcode, pointer)
+    instructions = intcode[pointer]
     opcode = instructions % 100
     param_modes = instructions.digits[2..] || []
         # 102.digits() => [2, 0, 1]
@@ -17,15 +17,15 @@ module AOC2019D05
   end
 
   # @return [Array] values of parameters
-  def get_params(intcode, instruction_pointer)
-    opcode, param_modes = *get_instructions(intcode, instruction_pointer)
+  def get_params(intcode, pointer)
+    opcode, param_modes = *get_instructions(intcode, pointer)
 
     case opcode
 
     when 3
-      return [ intcode[instruction_pointer + 1] ]
+      return [ intcode[pointer + 1] ]
     when 4
-      value = intcode[instruction_pointer + 1]
+      value = intcode[pointer + 1]
       if param_modes.first == 0  || param_modes.empty?  # position
         return intcode[value]
       elsif param_modes.first == 1 # "immediate" aka value
@@ -35,7 +35,7 @@ module AOC2019D05
 
     when 1, 2, 5, 6, 7, 8
       ret = 2.times.collect do |i|
-        params_pointer = instruction_pointer + 1 + i
+        params_pointer = pointer + 1 + i
         value = intcode[params_pointer]
         param_mode = param_modes[i]
 
@@ -45,7 +45,7 @@ module AOC2019D05
           value
         end
       end
-      ret.push intcode[instruction_pointer + 3]
+      ret.push intcode[pointer + 3]
 
       return ret
 
@@ -59,9 +59,9 @@ module AOC2019D05
 
 
   # @return [Intger] advance pointer by units
-  def execute_instruction(intcode, instruction_pointer)
-    opcode, param_mode = *get_instructions(intcode, instruction_pointer)
-    params = get_params(intcode, instruction_pointer)
+  def execute_instruction(intcode, pointer)
+    opcode, param_mode = *get_instructions(intcode, pointer)
+    params = get_params(intcode, pointer)
 
     case opcode
     when 1 # add
@@ -73,7 +73,8 @@ module AOC2019D05
       return 4
 
     when 3 # input
-      input = 0
+      puts "input please:"
+      input = gets.chomp.to_i
       intcode[params[0]] = input
       return 2
 
@@ -85,7 +86,7 @@ module AOC2019D05
     when 5  # jump if true
       if !params[0].zero?
         new_pointer_loc = params[1]
-        return new_pointer_loc - instruction_pointer
+        return new_pointer_loc - pointer
       else
         return 3
       end
@@ -93,7 +94,7 @@ module AOC2019D05
     when 6 # jump if false
       if params[0].zero?
         new_pointer_loc = params[1]
-        return new_pointer_loc - instruction_pointer
+        return new_pointer_loc - pointer
       else
         return 3
       end
@@ -125,13 +126,14 @@ module AOC2019D05
   end
 
   def execute_program(intcode_string)
-    instruction_pointer = 0
+    pointer = 0
     intcode = parse(intcode_string)
 
-    until instruction_pointer >= intcode.length
-      adv_pointer = execute_instruction(intcode, instruction_pointer)
+    until pointer >= intcode.length
+      binding.pry
+      adv_pointer = execute_instruction(intcode, pointer)
       break if adv_pointer.nil?
-      instruction_pointer += adv_pointer
+      pointer += adv_pointer
     end
 
     intcode
@@ -169,31 +171,31 @@ example6 = '3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,
 1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,
 999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99'
 
-# equals
-example7 = '1108, 9, 9, 0, 99'
-example8 = '0008, 0, 0, 0, 99'
-example9 = '0008, 0, 1, 0, 99'
-p execute_program(example7)
-p execute_program(example8)
-p execute_program(example9)
+# # equals
+# example7 = '1108, 9, 9, 0, 99'
+# example8 = '0008, 0, 0, 0, 99'
+# example9 = '0008, 0, 1, 0, 99'
+# p execute_program(example7)
+# p execute_program(example8)
+# p execute_program(example9)
+#
+# # less than
+# example10 = '1107, 1, 2, 0, 99'
+# example11 = '1107, 2, 1, 0, 99'
+# example12 = '1107, 2, 2, 0, 99'
+# puts "\n"
+# p execute_program(example10)
+# p execute_program(example11)
+# p execute_program(example12)
+#
+# example13 = '0007, 1, 0, 0, 99'
+# example14 = '0007, 1, 1, 0, 99'
+# p execute_program(example13)
+# p execute_program(example14)
 
-# less than
-example10 = '1107, 1, 2, 0, 99'
-example11 = '1107, 2, 1, 0, 99'
-example12 = '1107, 2, 2, 0, 99'
-puts "\n"
-p execute_program(example10)
-p execute_program(example11)
-p execute_program(example12)
 
-example13 = '0007, 1, 0, 0, 99'
-example14 = '0007, 1, 1, 0, 99'
-p execute_program(example13)
-p execute_program(example14)
-
-
-execute_program(example4)
-execute_program(example5)
+# execute_program(example4)
+# execute_program(example5)
 execute_program(example6)
 
 
