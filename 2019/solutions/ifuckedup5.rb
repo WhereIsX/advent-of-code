@@ -12,6 +12,10 @@ N_PARAMS = {
   2 => 2,
   3 => 0,
   4 => 1,
+  5 => 2,
+  6 => 2,
+  7 => 2,
+  8 => 2,
 }
 
 
@@ -70,6 +74,46 @@ def execute_section_and_return_new_pointer(program, pointer)
     puts params[0]
     return pointer + 2
 
+  # Opcode 5 is jump-if-true: if the first parameter is non-zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing.
+  # Opcode 6 is jump-if-false: if the first parameter is zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing.
+
+  # Opcode 7 is less than: if the first parameter is less than the second parameter, it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
+  # Opcode 8 is equals: if the first parameter is equal to the second parameter, it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
+
+  when 5 # jump if true (not zero)
+    if !params[0].zero?
+      return params[1]
+    else
+      return pointer + num_params + 1
+    end
+
+  when 6 # jump if false (eq zero)
+    if params[0].zero?
+      return params[1]
+    else
+      return pointer + num_params + 1
+    end
+
+  when 7 # less than
+    if params[0] < params[1]
+      program[write_to_address] = 1
+    else
+      program[write_to_address] = 0
+    end
+    return pointer + num_params + 2
+
+  when 8 # equals
+    if params[0] == params[1]
+      program[write_to_address] = 1
+    else
+      program[write_to_address] = 0
+    end
+    return pointer + num_params + 2
+
+
+
+
+
 
 
   else
@@ -93,7 +137,7 @@ def execute_program(program_string)
     pointer = execute_section_and_return_new_pointer(program, pointer)
   end
 
-  return program
+  # return program
 end
 
 
@@ -104,12 +148,22 @@ end
 # TDD gods are celebrating in heaven right meow:
 
 # TESTS
-ex1 = "1002,4,3,4,33"
-
+# ex1 = "1002,4,3,4,33"
 # puts "example 1: #{execute_program(ex1)[4] == 99}"
 
+# jump1 = "3,12,6,12,15,1,13,14,13,4,13,99,-1,0,1,9 "
+# puts "jump example 1: #{execute_program(jump1)}"
+#
+# jump2 = "3,3,1105,-1,9,1101,0,0,12,4,12,99,1"
+# puts "jump example 2: #{execute_program(jump2)}"
 
+# equal1 = "3,9,8,9,10,9,4,9,99,-1,8"
+# puts "equal to 8 example 1"
+# execute_program(equal1)
 
+# equal2 = "3,9,7,9,10,9,4,9,99,-1,8"
+# puts "equal to 8 example 2"
+# execute_program(equal2)
 
 
 
