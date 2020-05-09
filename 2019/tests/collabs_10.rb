@@ -9,7 +9,7 @@ ex1 = <<~EX
   ...##
   EX
 
-describe 'parsing' do
+describe 'Grid' do
   it 'parses correctly' do
     grid = Grid.new(ex1)
 
@@ -43,55 +43,69 @@ describe 'parsing' do
     expect(grid[Point.new(3, 4)]).to eq true
     expect(grid[Point.new(4, 4)]).to eq true
   end
-end
 
-describe 'find_asteroids' do
-  it 'returns empty sets of asteroids' do
-    grid = {}
-    asteroids = find_asteroids(grid)
-    expect(asteroids).to eq [].to_set
-  end
+  describe 'asteroids' do
+    it 'returns empty sets of asteroids' do
+      grid = Grid.new ""
+      asteroids = grid.asteroids
+      expect(asteroids).to eq [].to_set
+    end
 
-  it 'returns the correct set of asteroids' do
-    grid = {
-      Point.new(0, 0) => false,
-      Point.new(1, 0) => true,
-      Point.new(0, 1) => false,
-      Point.new(1, 1) => true,
-    }
-    asteroids = find_asteroids(grid)
-    expect(asteroids === Point.new(0, 0)).to eq false
-    expect(asteroids === Point.new(1, 0)).to eq true
-    expect(asteroids === Point.new(0, 1)).to eq false
-    expect(asteroids === Point.new(1, 1)).to eq true
+    it 'returns the correct set of asteroids' do
+      grid = Grid.new <<~ASTEROIDS
+      .#
+      .#
+      ASTEROIDS
+      asteroids = grid.asteroids
+      expect(asteroids === Point.new(0, 0)).to eq false
+      expect(asteroids === Point.new(1, 0)).to eq true
+      expect(asteroids === Point.new(0, 1)).to eq false
+      expect(asteroids === Point.new(1, 1)).to eq true
+    end
   end
 end
 
-describe 'find_all_visible' do
-  it 'works for a clear line of sight' do
-    start_point = Point.new(0, 0)
-    all_asteroids = [Point.new(0, 0), Point.new(1, 1)].to_set
-    visible = find_all_visible start_point, all_asteroids
-    expect(visible).to eq [Point.new(1, 1)].to_set
-  end
+describe 'RayTracer' do
+  describe 'find_all_visible' do
+    it 'works for a clear line of sight' do
+      grid = Grid.new <<~GAL
+      #.
+      .#
+      GAL
+      ray_tracer = RayTracer.new grid
+      start_point = Point.new(0, 0)
+      visible = ray_tracer.find_all_visible_from start_point
+      expect(visible).to eq [Point.new(1, 1)].to_set
+    end
 
-  it 'blocks lines of sights' do
-    start_point = Point.new(0, 0)
-    all_asteroids = [Point.new(0, 0), Point.new(1, 1), Point.new(2, 2)].to_set
-    visible = find_all_visible start_point, all_asteroids
-    expect(visible).to eq [Point.new(1, 1)].to_set
-  end
+    it 'blocks lines of sights' do
+      grid = Grid.new <<~GAL2
+      #..
+      .#.
+      ..#
+      GAL2
+      ray_tracer = RayTracer.new grid
+      start_point = Point.new(0, 0)
+      visible = ray_tracer.find_all_visible_from start_point
+      expect(visible).to eq [Point.new(1, 1)].to_set
+    end
 
-  it 'blocks weird lines of sights' do
-    start_point = Point.new(0, 0)
-    all_asteroids = [Point.new(0, 0), Point.new(1, 3), Point.new(2, 6)].to_set
-    visible = find_all_visible start_point, all_asteroids
-    expect(visible).to eq [Point.new(1, 3)].to_set
+    it 'blocks weird lines of sights' do
+      grid = Grid.new <<~GAL3
+      #......
+      ...#...
+      ......#
+      GAL3
+      ray_tracer = RayTracer.new grid
+      start_point = Point.new(0, 0)
+      visible = ray_tracer.find_all_visible_from start_point
+      expect(visible).to eq [Point.new(3, 1)].to_set
+    end
   end
 end
 
 describe 'entire thing' do
   it 'should return the best asteroid and its visible asteroids' do
-   p  solve_part_one(INPUT * 10)
+    p solve_part_one INPUT * 10 
   end
 end
