@@ -1,145 +1,141 @@
 require 'pry'
 
-def parse(program_string)
-  program = program_string
-    .split(',')
-    .collect { |num_as_str| num_as_str.to_i }
-end
-
-
-N_PARAMS = {
-  1 => 2,
-  2 => 2,
-  3 => 0,
-  4 => 1,
-  5 => 2,
-  6 => 2,
-  7 => 2,
-  8 => 2,
-}
-
-
-
-def execute_section_and_return_new_pointer(program, pointer)
-  opcode = program[pointer] % 100
-
-  return nil if opcode == 99 # nil breaks execute loop
-
-
-  num_params = N_PARAMS[opcode]
-
-  param_modes = program[pointer].digits[2..] || []
-
-  # thingies to be operated on, not including write to address
-  params = num_params.times.collect do |i|
-    curr_param_loc = i + pointer + 1
-    curr_param_mode = param_modes[i] || 0
-
-    # 1 immediate mode (value)
-    # 0 position mode (reference)
-    if curr_param_mode == 0
-      param = program[program[curr_param_loc]]
-
-    elsif curr_param_mode == 1
-      param = program[curr_param_loc]
-
-    end
-
-    param
+module AOC2019D05
+  def parse(program_string)
+    program = program_string
+      .split(',')
+      .collect { |num_as_str| num_as_str.to_i }
   end
 
-  write_to_address = program[pointer + num_params + 1]
 
-  # binding.pry
-
-
-  case opcode
-  when 1 # add
-    program[write_to_address] = params[0] + params[1]
-
-    return pointer + num_params + 2   # 1 for instruction + 1 for write_to_address
-
-  when 2 # multiply
-    program[write_to_address] = params[0] * params[1]
-    return pointer + num_params + 2   # 1 for instruction + 1 for write_to_address
+  N_PARAMS = {
+    1 => 2,
+    2 => 2,
+    3 => 0,
+    4 => 1,
+    5 => 2,
+    6 => 2,
+    7 => 2,
+    8 => 2,
+  }
 
 
-  when 3 # input
-    puts "input please:"
-    input = gets.chomp.to_i
-    program[write_to_address] = input
-    return pointer + 2
 
-  when 4 # print output
-    puts params[0]
-    return pointer + 2
+  def execute_section_and_return_new_pointer(program, pointer)
+    opcode = program[pointer] % 100
 
-  # Opcode 5 is jump-if-true: if the first parameter is non-zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing.
-  # Opcode 6 is jump-if-false: if the first parameter is zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing.
+    return nil if opcode == 99 # nil breaks execute loop
 
-  # Opcode 7 is less than: if the first parameter is less than the second parameter, it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
-  # Opcode 8 is equals: if the first parameter is equal to the second parameter, it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
 
-  when 5 # jump if true (not zero)
-    if !params[0].zero?
-      return params[1]
-    else
-      return pointer + num_params + 1
+    num_params = N_PARAMS[opcode]
+
+    param_modes = program[pointer].digits[2..] || []
+
+    # thingies to be operated on, not including write to address
+    params = num_params.times.collect do |i|
+      curr_param_loc = i + pointer + 1
+      curr_param_mode = param_modes[i] || 0
+
+      # 1 immediate mode (value)
+      # 0 position mode (reference)
+      if curr_param_mode == 0
+        param = program[program[curr_param_loc]]
+
+      elsif curr_param_mode == 1
+        param = program[curr_param_loc]
+
+      end
+
+      param
     end
 
-  when 6 # jump if false (eq zero)
-    if params[0].zero?
-      return params[1]
+    write_to_address = program[pointer + num_params + 1]
+
+    # binding.pry
+
+
+    case opcode
+    when 1 # add
+      program[write_to_address] = params[0] + params[1]
+
+      return pointer + num_params + 2   # 1 for instruction + 1 for write_to_address
+
+    when 2 # multiply
+      program[write_to_address] = params[0] * params[1]
+      return pointer + num_params + 2   # 1 for instruction + 1 for write_to_address
+
+
+    when 3 # input
+      puts "input please:"
+      input = gets.chomp.to_i
+      program[write_to_address] = input
+      return pointer + 2
+
+    when 4 # print output
+      puts params[0]
+      return pointer + 2
+
+    # Opcode 5 is jump-if-true: if the first parameter is non-zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing.
+    # Opcode 6 is jump-if-false: if the first parameter is zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing.
+
+    # Opcode 7 is less than: if the first parameter is less than the second parameter, it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
+    # Opcode 8 is equals: if the first parameter is equal to the second parameter, it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
+
+    when 5 # jump if true (not zero)
+      if !params[0].zero?
+        return params[1]
+      else
+        return pointer + num_params + 1
+      end
+
+    when 6 # jump if false (eq zero)
+      if params[0].zero?
+        return params[1]
+      else
+        return pointer + num_params + 1
+      end
+
+    when 7 # less than
+      if params[0] < params[1]
+        program[write_to_address] = 1
+      else
+        program[write_to_address] = 0
+      end
+      return pointer + num_params + 2
+
+    when 8 # equals
+      if params[0] == params[1]
+        program[write_to_address] = 1
+      else
+        program[write_to_address] = 0
+      end
+      return pointer + num_params + 2
+
     else
-      return pointer + num_params + 1
+      raise 'invalid opcode'
+
     end
-
-  when 7 # less than
-    if params[0] < params[1]
-      program[write_to_address] = 1
-    else
-      program[write_to_address] = 0
-    end
-    return pointer + num_params + 2
-
-  when 8 # equals
-    if params[0] == params[1]
-      program[write_to_address] = 1
-    else
-      program[write_to_address] = 0
-    end
-    return pointer + num_params + 2
-
-
-
-
-
-
-
-  else
-    raise 'invalid opcode'
-
   end
-end
 
 
 
 
 
 
-def execute_program(program_string)
+  def execute_program(program_string)
 
-  program = parse(program_string)
+    program = parse(program_string)
 
-  pointer = 0
+    pointer = 0
 
-  while !pointer.nil? && pointer < program.length
-    pointer = execute_section_and_return_new_pointer(program, pointer)
+    while pointer && pointer < program.length
+      pointer = execute_section_and_return_new_pointer(program, pointer)
+    end
+
+    # return program
   end
 
-  # return program
 end
-
 
 
 

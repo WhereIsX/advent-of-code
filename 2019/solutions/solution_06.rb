@@ -45,9 +45,7 @@ module AOC2019D06
 		n_san_ancestors = san_ancestors.keys.length
 		n_you_ancestors = you_ancestors.keys.length
 
-		puts n_you_ancestors + n_san_ancestors - (2 * n_common_ancestors)  
-
-
+		puts n_you_ancestors + n_san_ancestors - (2 * n_common_ancestors)
 	end
 
 	def distances_to_ancestors(planet)
