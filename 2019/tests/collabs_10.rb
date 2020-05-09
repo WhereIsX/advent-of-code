@@ -11,7 +11,7 @@ ex1 = <<~EX
 
 describe 'parsing' do
   it 'parses correctly' do
-    grid = parse(ex1)
+    grid = Grid.new(ex1)
 
     expect(grid[Point.new(0, 0)]).to eq false
     expect(grid[Point.new(1, 0)]).to eq true
@@ -82,10 +82,16 @@ describe 'find_all_visible' do
     expect(visible).to eq [Point.new(1, 1)].to_set
   end
 
-  it 'blocks lines of sights part two' do
+  it 'blocks weird lines of sights' do
     start_point = Point.new(0, 0)
     all_asteroids = [Point.new(0, 0), Point.new(1, 3), Point.new(2, 6)].to_set
     visible = find_all_visible start_point, all_asteroids
-    expect(visible).to eq [Point.new(1, 2)].to_set
+    expect(visible).to eq [Point.new(1, 3)].to_set
+  end
+end
+
+describe 'entire thing' do
+  it 'should return the best asteroid and its visible asteroids' do
+   p  solve_part_one(INPUT * 10)
   end
 end
