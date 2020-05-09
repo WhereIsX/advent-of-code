@@ -29,24 +29,25 @@ GALAXY
 
 ASTEROID_SYMBOL = '#'
 Point = Struct.new(:x, :y) do
-  def expand_radially distance
+  def expand_radially(distance)
     min_x = x - distance
     max_x = x + distance
     min_y = y - distance
     max_y = y + distance
 
-    found_asteroids = []
+    distant_points = Set.new
+
     (min_y..max_y).each do |y|
-      found_asteroids << Point.new(min_x, y)
-      found_asteroids << Point.new(max_x, y)
+      distant_points.add Point.new(min_x, y)
+      distant_points.add Point.new(max_x, y)
     end
 
     (min_x..max_x).each do |x|
-      found_asteroids << Point.new(x, min_y)
-      found_asteroids << Point.new(x, max_y)
+      distant_points.add Point.new(x, min_y)
+      distant_points.add Point.new(x, max_y)
     end
 
-    found_asteroids.to_set
+    distant_points
   end
 end
 
@@ -54,14 +55,14 @@ class Grid < Hash
   attr_reader :width, :height
 
   def initialize(input)
-    super({}) # {Point: Boolean}
+    super
     lines = input.split("\n")  # => [".....##..", "..##.###", …]
     @height = lines.length
     @width = @height.zero? ? 0 : lines[0].length
     lines.each.with_index do |row, y|
       row.each_char.with_index do |char, x|
         is_asteroid = char == ASTEROID_SYMBOL
-        self[Point.new(x, y)] = is_asteroid
+        self[Point.new(x, y)] = is_asteroid # {Point: Boolean}
       end
     end
   end
@@ -82,24 +83,26 @@ class RayTracer
   end
 
   def find_all_visible_from start_point
-    distance = 0
+    distance = 1
     visible = Set.new
-    asteroids = grid.asteroids.dup
-    loop do
-      distance += 1
-      neighbors = start_point.expand_radially(distance) & asteroids
-      neighbors.each { |neighbor| visible.add neighbor }
-      # for the neighboring asteroids check if their ray has been cached
-      # if yes, remove it and mark it as invisible
-      # if no, cache the ray and mark it as visible
-
-      # remove the invisible asteroids "rays"
+    asteroids = @grid.asteroids.dup
+    x, y = *start_point
+    while distance < @grid.max_distance do
+      # puts "expanding radially to distance #{distance}"
+      distant_points = start_point.expand_radially(distance) & asteroids
+      neighbors = distant_points
       neighbors.each do |neighbor|
-        x, y = *start_point
+        visible.add neighbor
+        # for the neighboring asteroids check if their ray has been cached
+        # if yes, remove it and mark it as invisible
+        # if no, cache the ray and mark it as visible
+
+        # remove the invisible asteroids "rays"
+        # puts "finding invisible asteroids for start point (#{x}, #{y})"
         asteroids -= invisible_asteroids x, y, neighbor
       end
 
-      break if distance >= @grid.max_distance
+      distance += 1
     end
     visible
   end
@@ -118,13 +121,13 @@ class RayTracer
     invisible = Set.new
     i = 1
     loop do
-      next_x = x + dx * i
-      next_y = y + dy * i
-      break if next_x < 0
-      break if next_y < 0
-      break if next_x >= @grid.width
-      break if next_y >= @grid.height
-      invisible.add Point.new next_x, next_y
+      next_asteroid_x = x + dx * i
+      next_asteroid_y = y + dy * i
+      break if next_asteroid_x < 0
+      break if next_asteroid_y < 0
+      break if next_asteroid_x >= @grid.width
+      break if next_asteroid_y >= @grid.height
+      invisible.add Point.new(next_asteroid_x, next_asteroid_y)INPUT * 10
       i += 1
     end
     invisible
@@ -176,3 +179,8 @@ def solve_part_one input
   end
   [best_asteroid, max_visibility]
 end
+
+
+123.to_s.split("").first  # 5 seconds
+123.digits.last           # .6s
+# you dropped out

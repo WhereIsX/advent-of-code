@@ -106,6 +106,6 @@ end
 
 describe 'entire thing' do
   it 'should return the best asteroid and its visible asteroids' do
-    p solve_part_one INPUT * 10 
+    p solve_part_one INPUT * 10
   end
 end
