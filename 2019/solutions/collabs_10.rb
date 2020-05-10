@@ -62,7 +62,9 @@ class Grid
   attr_reader :width, :height
 
   def initialize(input)
-    @cells = {}
+    @asteroids = {}
+    @max_x_distances = {}
+    @max_y_distances = {}
     lines = input.split("\n")  # => [".....##..", "..##.###", …]
     @height = lines.length
     @width = @height.zero? ? 0 : lines[0].length
@@ -79,11 +81,14 @@ class Grid
     # => Set{Point, Point, ...}
   end
 
-  def max_distance
-    @max_distance ||= [@width, @height].max
+  def max_distance_from start_point
+    x, y = *start_point
+    @max_x_distances[x] ||= (@width - start_point.x).abs
+    @max_y_distances[y] ||= (@height - start_point.y).abs
+    [@max_x_distances[x], @max_y_distances[y]].max
   end
 
-  def_delegators :@cells, :keys, "[]".to_sym, "[]=".to_sym
+  def_delegators :@asteroids, :keys, "[]".to_sym, "[]=".to_sym
 end
 
 class RayTracer
@@ -91,12 +96,16 @@ class RayTracer
     @grid = grid
   end
 
+  def shift_grid_relative_to(point)
+
+  end
+
   def find_all_visible_from start_point
     distance = 1
     visible = Set.new
     asteroids = @grid.asteroids.dup
     x, y = *start_point
-    while distance < @grid.max_distance do
+    while distance < @grid.max_distance_from(start_point) do
       # puts "expanding radially to distance #{distance}"
       distant_points = start_point.expand_radially(distance) & asteroids
       neighbors = distant_points
@@ -144,6 +153,88 @@ class RayTracer
     invisible
   end
 end
+
+=begin
+.........
+.........
+....o....
+.........
+.........
+=end
+
+class TemporaryRayTracer
+  #
+
+  def initialize grid, start_point
+    @grid = grid
+    @start_point = start_point
+  end
+
+  def vaporize_asteroids
+    all_asteroids = @grid.asteroids
+    rays = {}
+    all_asteroids.each do |asteroid|
+      next if start_point == asteroid
+      # fill up a hash by radian
+
+      dx = asteroid.x - @start_point.x
+      dy = asteroid.y - @start_point.y
+      theta = Math.atan2 -dy, dx  # betwen -PI, PI
+      [0,1,2,3]
+      # 0deg = 0
+      # 90deg = pi/2
+      # 180deg = pi        -pi
+      # 270deg = 3pi/2
+      # 360deg = 0
+      rays[theta] ||= []
+      rays[theta] << asteroid
+    end
+    upwards = Math::PI.fdiv 2   # the starting direction we look in (up)
+    rays.sort_by! do |theta, points|
+      # theta is the direction we look in to see the asteroid
+      # first come those thetas that are bigger than start_angle
+      diff = theta - upwards
+      # lowest value needs to be returned if diff is a very small positve value
+      # middle value needs to be returned if diff = PI
+      # highest value needs to be returned if diff = 0
+      highest_possible_diff = Math::PI.fdiv 2
+      -(diff % highest_possible_diff)
+      # if diff == 0 => upwards asteroid
+      # next one: smallest positive diff
+      # next one: highest positive diff
+      # next one: is the smallest diff (highest negative value)
+      # last one: is the closest negative diff to zero
+      # BUT: start_angle .. .. start_angle
+    end
+
+    i = 0
+    vaporized_asteroid = nil
+    loop do
+      rays.each do |ray|
+        break if i == 200
+        vaporized_asteroid = ray.shift
+        next unless vaporized_asteroid
+        i += 1
+      end
+    end
+
+    vaporized_asteroid
+    # result: array of rays (arrays of points)
+    # remove first element of each ray
+    # count
+    # boom
+  end
+
+end
+
+
+solve_part_two
+
+
+
+
+
+
 
 =begin
 #..Xx....x
@@ -197,6 +288,11 @@ def solve_part_one input
   [best_asteroid, max_visibility]
 end
 
+def solve_part_two input
+  best_asteroid = *(solve_part_one input)
+  grid = Grid.new input
+  ray_tracer = TemporaryRayTracer.new grid, best_asteroid
+  ray_tracer.vaporize_asteroids
+end
 
-# 123.to_s.split("").first  # 5 seconds
-# 123.digits.last           # .6s
+p solve_part_two input
