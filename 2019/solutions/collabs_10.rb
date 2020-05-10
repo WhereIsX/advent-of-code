@@ -3,6 +3,8 @@
 ####################################
 # MINASWAN == "Matz is nice and so we are nice"
 
+require 'forwardable'
+
 INPUT = <<~GALAXY.chomp
 ...###.#########.####
 .######.###.###.##...
@@ -42,20 +44,25 @@ Point = Struct.new(:x, :y) do
       distant_points.add Point.new(max_x, y)
     end
 
-    (min_x..max_x).each do |x|
+    (min_x...max_x).each do |x|
       distant_points.add Point.new(x, min_y)
       distant_points.add Point.new(x, max_y)
     end
 
     distant_points
   end
+
+  def to_s
+    "(#{x}, #{y})".rjust(10)
+  end
 end
 
-class Grid < Hash
+class Grid
+  extend Forwardable
   attr_reader :width, :height
 
   def initialize(input)
-    super
+    @cells = {}
     lines = input.split("\n")  # => [".....##..", "..##.###", …]
     @height = lines.length
     @width = @height.zero? ? 0 : lines[0].length
@@ -68,13 +75,15 @@ class Grid < Hash
   end
 
   def asteroids
-    self.keys.select { |point| self[point] }.to_set
+    keys.select { |point| self[point] }.to_set
     # => Set{Point, Point, ...}
   end
 
   def max_distance
     @max_distance ||= [@width, @height].max
   end
+
+  def_delegators :@cells, :keys, "[]".to_sym, "[]=".to_sym
 end
 
 class RayTracer
@@ -99,7 +108,9 @@ class RayTracer
 
         # remove the invisible asteroids "rays"
         # puts "finding invisible asteroids for start point (#{x}, #{y})"
-        asteroids -= invisible_asteroids x, y, neighbor
+        invisible_asteroids(x, y, neighbor).each do |invisible|
+          asteroids.delete invisible
+        end
       end
 
       distance += 1
@@ -118,7 +129,7 @@ class RayTracer
       dx /= gcd
       dy /= gcd
     end
-    invisible = Set.new
+    invisible = []
     i = 1
     loop do
       next_asteroid_x = x + dx * i
@@ -127,7 +138,7 @@ class RayTracer
       break if next_asteroid_y < 0
       break if next_asteroid_x >= @grid.width
       break if next_asteroid_y >= @grid.height
-      invisible.add Point.new(next_asteroid_x, next_asteroid_y)INPUT * 10
+      invisible << Point.new(next_asteroid_x, next_asteroid_y)
       i += 1
     end
     invisible
@@ -168,19 +179,24 @@ def solve_part_one input
   puts "we has #{all_asteroids.length} asteroids in total "
   max_visibility = 0
   best_asteroid = nil
+  i = 0
   all_asteroids.each do |asteroid|
-    puts "Checking deez asteroid #{asteroid}"
+    i += 1
+    progress = (i.fdiv(all_asteroids.length) * 100).round(1).to_s.rjust(5)
+    print "[#{progress}%]  Asteroid at #{asteroid} sees "
     visible = ray_tracer.find_all_visible_from asteroid
+    printf "#{visible.size.to_s.rjust(5)} others"
     if visible.size > max_visibility
-      puts "Deez asteroid can see #{visible.size} other asteroids! Wowywow"
+      print " [new max]\n"
       max_visibility = visible.size
       best_asteroid = asteroid
+    else
+      print "\n"
     end
   end
   [best_asteroid, max_visibility]
 end
 
 
-123.to_s.split("").first  # 5 seconds
-123.digits.last           # .6s
-# you dropped out
+# 123.to_s.split("").first  # 5 seconds
+# 123.digits.last           # .6s

@@ -106,6 +106,9 @@ end
 
 describe 'entire thing' do
   it 'should return the best asteroid and its visible asteroids' do
-    p solve_part_one INPUT * 10
+    input = (INPUT * 10).split("\n").shuffle.join("\n")
+    best_asteroid, visible = *(solve_part_one input)
+    puts
+    puts "The best asteroid #{best_asteroid} can see #{visible} other asteroids!"
   end
 end
