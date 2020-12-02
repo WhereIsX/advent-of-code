@@ -1,0 +1,2 @@
+language = "bash"
+run = "crystal run ./2020/solution_02.cr"
