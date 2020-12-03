@@ -149,13 +149,6 @@ describe "Part 2" do
         solve_for_slope(example, {dx: 5, dy: 1}).should eq 3
         solve_for_slope(example, {dx: 7, dy: 1}).should eq 4
       end
-
-      pending "correctly calculates collisions for the input" do
-        solve_for_slope(INPUT, {dx: 0, dy: 0}).should eq 0
-        solve_for_slope(INPUT, {dx: 0, dy: 1}).should eq 0
-        solve_for_slope(INPUT, {dx: 1, dy: 0}).should eq 0
-        solve_for_slope(INPUT, {dx: 1, dy: 1}).should eq 0
-      end
     end
 
     describe "solution" do
