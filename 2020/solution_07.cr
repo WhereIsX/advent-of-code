@@ -21,6 +21,12 @@ class Bag
     @inner_bags = inner
     @outer_bags = outer
   end 
+
+  def inspect
+    inner = @inner_bags.map {|bag, _| bag.color}
+    outer = @outer_bags.map {|bag| bag.color}
+    return "@color: #{@color} \n@inner_bags: #{inner} \n@outer_bags: #{outer} \n\n"
+  end 
 end 
 
 # return a DAG from the strings
@@ -31,6 +37,10 @@ def parse(puzzle)
 
   puzzle.split("\n", remove_empty: true).each do |line|
     parent_color = line.split(" bags contain").first
+    parent_bag = bags[parent_color]? || Bag.new(parent_color)
+    bags[parent_color] = parent_bag
+
+
     children = line.scan(/(?<bag_count>\d+) (?<bag_color>\w+ \w+)\sbag/).map { |match| match.named_captures }
     # [{"bag_count" => "5", "bag_color" => "faded blue"}, 
     #  {"bag_count" => "6", "bag_color" => "dotted black"}]
@@ -42,15 +52,12 @@ def parse(puzzle)
     # also connect parent w child  (parent aware of child)
     # add both child && parent to bags 
 
-    parent_bag = bags[parent_color]? || Bag.new(parent_color)
-    bags[parent_color] = parent_bag 
-
     children.each do |child|
       if (color = child["bag_color"]) && (count = child["bag_count"])
         child_bag = bags[color]? || Bag.new(color)
         child_bag.outer_bags.push parent_bag
         parent_bag.inner_bags[child_bag] = count.to_u32
-        bags[color] = child_bag 
+        bags[color] = child_bag
       end 
     end 
   end 
@@ -79,4 +86,19 @@ def get_outer_bags_colors(bag)
   return outer_bags_set
 end 
 
-p! solve_part_1(INPUT)
+def solve_part_2(puzzle)
+  bags = parse(puzzle)
+  shiny_gold_bag = bags["shiny gold"]
+
+  return count_inner_bags(shiny_gold_bag)
+end 
+
+
+def count_inner_bags(bag)
+  count = bag.inner_bags.sum(0) do |inner_bag, count|
+    count + (count_inner_bags(inner_bag) * count)
+  end 
+  return count
+end
+
+p! solve_part_2(INPUT)
