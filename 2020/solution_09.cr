@@ -44,4 +44,29 @@ example = "
 576
 "
 
-p! solve_part_1(INPUT)
+
+
+def solve_part_2(puzzle, target_sum)
+  data = parse(puzzle)
+
+  sum_so_far = 0_i64
+  first_num_pos = 0_i32 
+  last_num_pos = 0_i32
+
+  data.each.with_index do |num, i|
+    sum_so_far += num 
+    if sum_so_far > target_sum
+      sum_so_far - data[first_num_pos]
+      first_num_pos += 1 
+    elsif sum_so_far == target_sum
+      last_num_pos = i 
+      break
+    end 
+  end
+
+  preamble = data[first_num_pos..last_num_pos].sort
+  return preamble.first + preamble.last 
+end 
+
+
+p! solve_part_2(example, 127) 
