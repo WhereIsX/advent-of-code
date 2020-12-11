@@ -44,7 +44,7 @@ example = "
 576
 "
 
-
+ "1 1 100 3 1, target=103"
 
 def solve_part_2(puzzle, target_sum)
   data = parse(puzzle)
@@ -55,10 +55,12 @@ def solve_part_2(puzzle, target_sum)
 
   data.each.with_index do |num, i|
     sum_so_far += num 
-    if sum_so_far > target_sum
-      sum_so_far - data[first_num_pos]
+
+    while sum_so_far > target_sum
+      sum_so_far -= data[first_num_pos]
       first_num_pos += 1 
-    elsif sum_so_far == target_sum
+    end
+    if sum_so_far == target_sum
       last_num_pos = i 
       break
     end 
@@ -66,7 +68,8 @@ def solve_part_2(puzzle, target_sum)
 
   preamble = data[first_num_pos..last_num_pos].sort
   return preamble.first + preamble.last 
+
 end 
 
 
-p! solve_part_2(example, 127) 
+p! solve_part_2(INPUT, INVALID_NUMBER) 
