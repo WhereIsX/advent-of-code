@@ -25,7 +25,7 @@ def solve_part_1(puzzle_input)
     time_since = earliest_bustime % bus
 
     # time until the next departure 
-    {bus: bus, time_until_next: bus - time_since}  
+    {bus: bus, time_until_next: bus - time_since}
   end.min_by{ |bus| bus[:time_until_next] }
 
   return next_bus[:bus] * next_bus[:time_until_next]
