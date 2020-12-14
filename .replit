@@ -1,2 +1,2 @@
 language = "bash"
-run = "crystal run ./2020/solution_11.cr"
+run = "crystal run ./2020/solution_12.cr"
