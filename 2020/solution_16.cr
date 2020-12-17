@@ -91,12 +91,20 @@ def solve_part_2(puzzle)
   # if not, go to next field 
   # if yes, go to the next value 
 
-  # requirements # [{field: "class", ranges: [1..3, 5..7]}]
-  # [ {"class" => [1..3, 5..7], ...}
+  # requirements # {"class" => [1..3, 5..7], "row" => [0..5, 8..19]} 
  
   columns.each do |column| 
+    viable_fields = requirements.keys 
     column.each do |value|
-      
+      viable_fields.each do |viable_field|
+        ranges = requirements[viable_field] 
+          within_first_range = ranges.first.includes?(value) 
+          within_second_range = ranges.last.includes?(value) 
+          if !within_first_range && !within_second_range
+            viable_fields.delete(viable_range)
+          end 
+        end 
+      end 
     end 
   end 
 end
