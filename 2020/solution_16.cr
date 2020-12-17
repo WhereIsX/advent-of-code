@@ -30,16 +30,18 @@ nearby tickets:
 
 
 def parse(puzzle)
-  requirements, my_ticket, nearby_tickets = puzzle.split("\n\n", remove_empty: true)
+  raw_requirements, my_ticket, nearby_tickets = puzzle.split("\n\n", remove_empty: true)
+
+  # {"class" => [1..3, 5..7], "row" => [0..5, 8..19]} 
+  requirements = Hash(String, Array(Range(Int32,Int32))).new
   
-  # [{field: "thing", ranges: [1..3, 5..7]}]
-  requirements = requirements.split("\n", remove_empty: true).map do |requirement|
+  raw_requirements.split("\n", remove_empty: true).each do |requirement|
     field, ranges = requirement.split(": ")
     ranges = ranges.split(" or ").map do |range|
       num1, num2 = range.split("-")
       (num1.to_i..num2.to_i)
     end 
-    {field: field, ranges: ranges}
+    requirements[field] = ranges
   end
 
   # [ints]
@@ -56,9 +58,7 @@ end
 def solve_part_1(puzzle)
   requirements, my_ticket, nearby_tickets = parse(puzzle)
 
-  ranges = requirements.map do |requirement|
-    requirement[:ranges]
-  end.flatten 
+  ranges = requirements.values.flatten 
 
   invalid_values = Array(Int32).new
   nearby_tickets.flatten.each do |value|
@@ -91,10 +91,9 @@ def solve_part_2(puzzle)
   # if not, go to next field 
   # if yes, go to the next value 
 
-  requirements # [{field: "class", ranges: [1..3, 5..7]}]
+  # requirements # [{field: "class", ranges: [1..3, 5..7]}]
   # [ {"class" => [1..3, 5..7], ...}
-    {
-  ]
+ 
   columns.each do |column| 
     column.each do |value|
       
@@ -105,9 +104,7 @@ end
 def find_valid_tickets(tickets, requirements)
   requirements
 
-  ranges = requirements.map do |requirement|
-    requirement[:ranges]
-  end.flatten 
+  ranges = requirements.values.flatten 
 
   valid_tickets = Array(Array(Int32)).new
   tickets.each do |ticket|
@@ -125,4 +122,4 @@ def find_valid_tickets(tickets, requirements)
   return valid_tickets
 end 
 
-solve_part_2(example)
+p! solve_part_1(example)
