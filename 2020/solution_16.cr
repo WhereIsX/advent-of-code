@@ -27,7 +27,7 @@ nearby tickets:
 15,1,5
 5,14,9
 "
-
+example2ans = %w(row class seat)
 
 def parse(puzzle)
   raw_requirements, my_ticket, nearby_tickets = puzzle.split("\n\n", remove_empty: true)
@@ -78,7 +78,7 @@ def solve_part_2(puzzle)
   # each slice => find the field for which all the values are valid 
   
   columns = Array(Array(Int32)).new
-  valid_tickets.first.length times do |i|
+  valid_tickets.first.size.times do |i|
     column = valid_tickets.map do |valid_ticket|
       valid_ticket[i]
     end  
@@ -93,20 +93,57 @@ def solve_part_2(puzzle)
 
   # requirements # {"class" => [1..3, 5..7], "row" => [0..5, 8..19]} 
  
-  columns.each do |column| 
+  fields_order = columns.map do |column| 
     viable_fields = requirements.keys 
     column.each do |value|
-      viable_fields.each do |viable_field|
+
+      viable_fields = viable_fields.select do |viable_field|
         ranges = requirements[viable_field] 
-          within_first_range = ranges.first.includes?(value) 
-          within_second_range = ranges.last.includes?(value) 
-          if !within_first_range && !within_second_range
-            viable_fields.delete(viable_range)
-          end 
-        end 
+        within_first_range = ranges.first.includes?(value) 
+        within_second_range = ranges.last.includes?(value) 
+        within_first_range || within_second_range
       end 
+
+    end 
+    viable_fields
+  end 
+
+  bad_practice = resolve_to_one_field_per_column(fields_order)
+  final_values = Array(Int64).new
+  bad_practice.each.with_index do |field,  index|
+    if field.starts_with?("departure" )
+      final_values << my_ticket[index].to_i64
     end 
   end 
+  raise "wat" if final_values.size != 6 
+  return final_values.product
+end
+
+
+def resolve_to_one_field_per_column(fields)
+  final_order = Array.new(fields.size, "")
+  fields_to_remove = Array(String).new
+
+  loop do  
+    fields.each.with_index.find do |field, i|
+      if field.size == 1 
+        final_order[i] = field.first
+        fields_to_remove.push(field.first) 
+      end 
+    end 
+    # ["row"]
+    break if fields_to_remove.empty? 
+    
+    fields = fields.map do |field|
+      fields_to_remove.each do |field_to_remove|
+        field.delete(field_to_remove)
+      end 
+      field 
+    end 
+    fields_to_remove.clear
+  end 
+
+  return final_order 
 end
 
 def find_valid_tickets(tickets, requirements)
@@ -130,4 +167,5 @@ def find_valid_tickets(tickets, requirements)
   return valid_tickets
 end 
 
-p! solve_part_1(example)
+p! solve_part_2(INPUT)
+p! example2ans
