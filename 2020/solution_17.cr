@@ -24,8 +24,12 @@ def parse(puzzle)
     # row == "..#.."
     row.each_char_with_index do |cube, x|
       cube_world["x#{x}y#{y}z0"] = cube
+      cube_world["x#{x}y#{y}z1"] = '.'
+      cube_world["x#{x}y#{y}z-1"] = '.'
     end 
   end 
+
+
 
   return cube_world 
 end 
@@ -50,7 +54,7 @@ def solve_part_1(puzzle)
   cube_world = parse(puzzle) 
   dimensions = puzzle.split("\n", remove_empty: true).size
 
-  2.upto(2+6) do |i|
+  2.upto(2+5) do |i|
 
     cube_world = cube_world.map do |position, cube|
       neighbors = find_neighbors(position, cube_world)
@@ -65,13 +69,10 @@ def solve_part_1(puzzle)
     end.to_h
 
     # pad
-    (-i..(dimensions + i)).to_a.each_repeated_permutation(2) do |(dim1, dim2)|
-      cube_world["x#{dim1}y#{dim2}z#{-i}"] = '.'
-      cube_world["x#{dim1}y#{dim2}z#{dimensions + i}"] = '.'
-      cube_world["x#{dim1}y#{-i}z#{dim2}"] = '.'
-      cube_world["x#{dim1}y#{dimensions + i}z#{dim2}"] = '.'
-      cube_world["x#{-i}y#{dim1}z#{dim2}"] = '.'
-      cube_world["x#{dimensions + i}y#{dim1}z#{dim2}"] = '.'
+    (-i..(dimensions + i)).to_a.each_repeated_permutation(3) do |(x, y, z)|
+      if !cube_world.has_key?("x#{x}y#{y}z#{z}")
+        cube_world["x#{x}y#{y}z#{z}"] = '.'  
+      end 
     end 
 
   end 
@@ -80,7 +81,7 @@ def solve_part_1(puzzle)
 end 
 
 
-p! solve_part_1(example)
+p! solve_part_1(INPUT)
 
 
 # keep a hash of all cubes 
