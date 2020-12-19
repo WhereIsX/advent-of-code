@@ -21,7 +21,7 @@ def solve_part_1(puzzle)
   problems.map do |problem|
     solve_one_math_problem(problem)
   end.compact.sum
-end 
+end
 
 def solve_one_math_problem(problem)
 
@@ -78,4 +78,63 @@ def solve_one_math_problem(problem)
   return result
 end 
 
-p! solve_part_1(INPUT)
+
+def solve_part_2(puzzle)
+  problems = parse(puzzle)
+
+  problems.map do |problem|
+    solve_math_problem_part_2(problem)
+  end.sum
+end 
+
+def parenthesize(problem)
+  # find each '+'
+    # go left, if char immediately to the left is NOT ')'
+    # => insert a '(' to the left of that char 
+    # loop begin 
+    # if the char IS a ')', then save the ')' 
+    # and keep looking left until we find a '(' 
+    # end 
+    # once we have matched the # of '(' and ')'
+    # we can insert a '(' to the left of that char 
+
+  problem.each_char_with_index 
+end 
+
+
+def solve_math_problem_part_2(problem)
+  loop do  
+    result = problem.gsub(/\(([^()]+)\)/) { |_, match| 
+      solve_with_flipped_precedence(match[1])
+    }
+    break if result == problem 
+    problem = result 
+  end
+  return solve_with_flipped_precedence(problem).to_i64
+end 
+
+# does not handle parens 
+def solve_with_flipped_precedence(problem)
+  # solve the addition first until there are no more additions
+  loop do  
+    result = problem.gsub(/(\d+)\+(\d+)/) { |_, match| 
+      match[1].to_i64 + match[2].to_i64 
+    }
+    break if result == problem 
+    problem = result 
+  end
+  # solve the multiplication until there are no more multiplications
+  loop do  
+    result = problem.gsub(/(\d+)\*(\d+)/) { |_, match| 
+      match[1].to_i64 * match[2].to_i64 
+    }
+    break if result == problem 
+    problem = result 
+  end
+
+  return problem 
+end 
+
+p! solve_part_2(INPUT)
+
+
