@@ -15,11 +15,14 @@ aaabbb
 aaaabbb
 "
 
+# valid_message =
 # track path 
-# look at first leaf 
-# go to the rules#leaf => return the string "a"
-#   when we hit a string, we return to the last level (see path)
-
+# look at leaf 
+# go to the rules#leaf => 
+# repeated go to rules#leaf until we find string
+#   
+#   we return to the last level (see path)
+#
 
 
 ex1_all_matches = "aaaabb, aaabab, abbabb, abbbab, aabaab, aabbbb, abaaab, ababbb"
@@ -65,4 +68,3 @@ def parse_rules(rules)
   end.to_h
 end 
 p! parse(ex1)
-
