@@ -77,14 +77,12 @@ def solve_part_2(puzzle)
   parsed_messages = parse(puzzle)
 
 
-  borders = Hash(String, Array(Int32)).new # {"#.##." => [{tile_id, i}, ], ...}
+  borders = Hash(String, Array(NamedTuple(tile_id: Int32, side: Int32)).new do |hash, key|
+    hash[key] = Array(NamedTuple(tile_id: Int32, side: Int32).new
+  end # {"#.##." => [{tile_id, i}, ], ...}
   parsed_messages.each do |(tile_id, whole_tile)|
     get_borders(whole_tile).each_with_index do |border, i|
-      if borders.has_key?(border)
-        borders[border] = borders[border].push({tile_id: tile_id, side: i})
-      else 
-        borders[border] = [{tile_id: tile_id, side: i}]
-      end
+      borders[border] = borders[border].push({tile_id: tile_id, side: i})
     end 
   end 
 
