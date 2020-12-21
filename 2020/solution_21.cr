@@ -44,4 +44,33 @@ def make_allergen_recipe_map(recipe_list)
   return allergen_recipe_map # {"dairy" => [Recipe1, Recipe2, ...]}
 end
 
-p! solve_part_1(INPUT)
+def solve_part_2(puzzle)
+  recipe_list = parse(puzzle)
+  allergen_recipe_map = make_allergen_recipe_map(recipe_list) 
+
+  allergenic_ingredients = Hash(String, Array(String)).new
+  allergen_recipe_map.each do |allergen, recipes|
+    allergenic_ingredients[allergen] = recipes.reduce{ |final_bawss, recipe| final_bawss & recipe }
+  end 
+
+  return map_allergen_to_native_lang(allergenic_ingredients).sort.map(&.last.first).join(",")
+
+end 
+
+def map_allergen_to_native_lang(allergenic_ingredients)
+  allergens_names = Array(Tuple(String, Array(String))).new
+  
+  next_allergen = allergenic_ingredients.find{ |_, ingredients| ingredients.size == 1 }
+  # next_allergen == {"nuts" => ["spl"]}
+  until next_allergen.nil? 
+    name_in_native_lang = next_allergen.last.first
+    allergens_names.push next_allergen.clone
+    allergenic_ingredients.each do |_, potential_names| 
+      potential_names.delete(name_in_native_lang)
+    end 
+    next_allergen = allergenic_ingredients.find{ |_, ingredients| ingredients.size == 1 }
+  end 
+  return allergens_names
+end 
+
+p! solve_part_2(INPUT)
